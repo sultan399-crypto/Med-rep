@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
+<title>Med Rep Dashboard</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f3ef;
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6a65;
+    --border: rgba(0,0,0,0.12);
+    --radius-md: 8px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #161614;
+      --text-primary: #f0efe9;
+      --text-secondary: #9a988f;
+      --border: rgba(255,255,255,0.14);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-sans); background: var(--bg-secondary); color: var(--text-primary); }
+  .stage { padding: 20px 0; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; }
+  .phone { width: 375px; background: var(--bg-primary); border-radius: 40px; border: 0.5px solid var(--border); overflow: hidden; min-height: 800px; display: flex; flex-direction: column; }
+  .status-bar { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+  .status-time { font-size: 15px; font-weight: 500; }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+  .nav-header { padding: 4px 20px 12px; }
+  .nav-header h1 { font-size: 22px; font-weight: 500; margin: 0 0 2px; }
+  .nav-header p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+  .scroll-area { flex: 1; overflow-y: auto; padding: 0 16px 16px; scrollbar-width: none; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 10px; }
+  .section-title { font-size: 15px; font-weight: 500; margin: 0; }
+  .section-link { font-size: 13px; color: #378ADD; cursor: pointer; }
+  .card { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .av-blue { background: #E6F1FB; color: #0C447C; }
+  .av-teal { background: #E1F5EE; color: #085041; }
+  .av-amber { background: #FAEEDA; color: #633806; }
+  .av-purple { background: #EEEDFE; color: #3C3489; }
+  .av-coral { background: #FAECE7; color: #712B13; }
+  .info { flex: 1; min-width: 0; }
+  .name { font-size: 14px; font-weight: 500; margin: 0 0 2px; }
+  .sub { font-size: 12px; color: var(--text-secondary); margin: 0; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .stage-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 5px 10px; border-radius: 20px; font-weight: 500; border: none; cursor: pointer; white-space: nowrap; min-height: 28px; }
+  .tab-bar { background: var(--bg-primary); border-top: 0.5px solid var(--border); display: flex; align-items: flex-start; padding: 8px 0 12px; }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+  .tab-icon { font-size: 20px; color: var(--text-secondary); }
+  .tab-icon.active { color: #378ADD; }
+  .tab-label { font-size: 10px; color: var(--text-secondary); }
+  .tab-label.active { color: #378ADD; }
+  .screen { display: none; }
+  .add-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border: 0.5px dashed var(--border); border-radius: 14px; background: var(--bg-secondary); color: #378ADD; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 8px; }
+  .add-form { background: var(--bg-secondary); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .add-form input { width: 100%; margin-bottom: 8px; height: 36px; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 0 10px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px; }
+  .form-actions { display: flex; gap: 8px; }
+  .form-actions button { flex: 1; height: 36px; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); font-size: 14px; cursor: pointer; }
+  .consume-acct { margin-bottom: 14px; }
+  .consume-acct-name { font-size: 14px; font-weight: 500; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+  .grid-scroll { overflow-x: auto; border: 0.5px solid var(--border); border-radius: 12px; }
+  .grid-scroll::-webkit-scrollbar { height: 6px; }
+  .ctable { border-collapse: collapse; font-size: 11px; }
+  .ctable th, .ctable td { padding: 0; border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); text-align: center; }
+  .ctable th { background: var(--bg-secondary); color: var(--text-secondary); font-weight: 500; padding: 6px 4px; }
+  .ctable td:first-child, .ctable th:first-child { position: sticky; left: 0; background: var(--bg-secondary); text-align: left; padding: 6px 8px; min-width: 96px; z-index: 1; font-weight: 500; color: var(--text-primary); }
+  .ctable td input { width: 42px; height: 30px; border: none; background: transparent; text-align: center; font-size: 11px; color: var(--text-primary); padding: 0; }
+  .ctable td input:focus { background: #E6F1FB; color: #0C447C; outline: none; box-shadow: inset 0 0 0 1.5px #378ADD; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div>
+    </div>
+
+    <div class="nav-header">
+      <h1 id="screen-title">My territory</h1>
+      <p id="screen-sub">June 2026 &middot; Jeddah West</p>
+    </div>
+
+    <div class="scroll-area" id="home-screen" style="display:block;">
+      <div class="section-header"><p class="section-title">Speaker meetings</p><span class="section-link" onclick="switchTab('speaker')">Open &rsaquo;</span></div>
+      <div class="card" onclick="switchTab('speaker')">
+        <div class="row">
+          <div class="avatar av-purple" id="home-spk-av">AG</div>
+          <div class="info"><p class="name" id="home-spk-name">Dr. Al-Ghamdi</p><p class="sub" id="home-spk-sub">Cardiology &middot; Erfan</p></div>
+          <span class="badge" id="home-spk-stage" style="background:#FAEEDA;color:#633806;">Process</span>
+        </div>
+      </div>
+
+      <div class="section-header"><p class="section-title">Consumption</p><span class="section-link" onclick="switchTab('consume')">Open &rsaquo;</span></div>
+      <div class="card" onclick="switchTab('consume')">
+        <div class="row">
+          <div class="avatar av-teal">DS</div>
+          <div class="info"><p class="name">DSFH</p><p class="sub">6 SKUs &middot; Jan&ndash;Dec</p></div>
+          <i class="ti ti-chevron-right" style="color:var(--text-secondary)"></i>
+        </div>
+      </div>
+
+      <div class="section-header"><p class="section-title">Tasks</p><span class="section-link" onclick="switchTab('tasks')">Open &rsaquo;</span></div>
+      <div class="card" onclick="switchTab('tasks')">
+        <div class="row">
+          <div class="avatar av-blue">SV</div>
+          <div class="info"><p class="name">Savvy</p><p class="sub">In progress</p></div>
+          <i class="ti ti-chevron-right" style="color:var(--text-secondary)"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-area screen" id="speaker-screen">
+      <div style="height:8px;"></div>
+      <button class="add-btn" onclick="toggleForm()"><i class="ti ti-plus"></i> Add speaker</button>
+      <div class="add-form" id="add-form" style="display:none;">
+        <input type="text" id="spk-name-in" placeholder="Speaker name" />
+        <input type="text" id="spk-sub-in" placeholder="Specialty &middot; Account" />
+        <div class="form-actions">
+          <button onclick="addSpeaker()">Save</button>
+          <button onclick="toggleForm()">Cancel</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin:4px 0 10px;">Tap the stage chip to advance</p>
+      <div id="speaker-list"></div>
+    </div>
+
+    <div class="scroll-area screen" id="consume-screen">
+      <div style="height:8px;"></div>
+      <p style="font-size:12px;color:var(--text-secondary);margin:0 0 12px;">Units per SKU &middot; scroll right for Feb&ndash;Dec</p>
+      <div id="consume-list"></div>
+    </div>
+
+    <div class="scroll-area screen" id="tasks-screen">
+      <div style="height:8px;"></div>
+      <div class="card" style="cursor:default;">
+        <div class="row">
+          <div class="avatar av-blue">SV</div>
+          <div class="info"><p class="name">Savvy</p><p class="sub">Current task</p></div>
+          <span class="badge" style="background:#E6F1FB;color:#0C447C;">In progress</span>
+        </div>
+      </div>
+      <div class="card" style="cursor:default;">
+        <div class="row">
+          <div class="avatar av-coral">ES</div>
+          <div class="info"><p class="name">EduStream</p><p class="sub">Current task</p></div>
+          <span class="badge" style="background:#E6F1FB;color:#0C447C;">In progress</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item" onclick="switchTab('home')"><i class="ti ti-home tab-icon active" id="icon-home"></i><span class="tab-label active" id="label-home">Home</span></div>
+      <div class="tab-item" onclick="switchTab('speaker')"><i class="ti ti-microphone tab-icon" id="icon-speaker"></i><span class="tab-label" id="label-speaker">Speaker</span></div>
+      <div class="tab-item" onclick="switchTab('consume')"><i class="ti ti-chart-bar tab-icon" id="icon-consume"></i><span class="tab-label" id="label-consume">Consumption</span></div>
+      <div class="tab-item" onclick="switchTab('tasks')"><i class="ti ti-checklist tab-icon" id="icon-tasks"></i><span class="tab-label" id="label-tasks">Tasks</span></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const tabs = ['home','speaker','consume','tasks'];
+const screenMap = { home:'home-screen', speaker:'speaker-screen', consume:'consume-screen', tasks:'tasks-screen' };
+const titles = { home:['My territory','June 2026 \u00B7 Jeddah West'], speaker:['Speaker','Upcoming meetings'], consume:['Consumption','By account \u00B7 Jan\u2013Dec'], tasks:['Tasks','Current'] };
+
+function switchTab(t){
+  tabs.forEach(id=>{
+    document.getElementById(screenMap[id]).style.display = id===t?'block':'none';
+    document.getElementById('icon-'+id).classList.toggle('active', id===t);
+    document.getElementById('label-'+id).classList.toggle('active', id===t);
+  });
+  document.getElementById('screen-title').textContent = titles[t][0];
+  document.getElementById('screen-sub').textContent = titles[t][1];
+}
+
+const STAGES = ['Process','Presentation','Service agreement','Approved','Closing','Fees'];
+const STAGE_COLOR = {
+  'Process':['#FAEEDA','#633806'],
+  'Presentation':['#E6F1FB','#0C447C'],
+  'Service agreement':['#EEEDFE','#3C3489'],
+  'Approved':['#E1F5EE','#085041'],
+  'Closing':['#FBEAF0','#72243E'],
+  'Fees':['#EAF3DE','#27500A']
+};
+const STAGE_ICON = {
+  'Process':'ti-loader','Presentation':'ti-presentation','Service agreement':'ti-file-text',
+  'Approved':'ti-circle-check','Closing':'ti-flag','Fees':'ti-cash'
+};
+const AV = ['av-purple','av-blue','av-teal','av-amber','av-coral'];
+
+const SPK_KEY = 'medrep_speakers_v1';
+const CONS_KEY = 'medrep_consumption_v1';
+
+function loadSpeakers(){
+  try {
+    const raw = localStorage.getItem(SPK_KEY);
+    if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr) && arr.length) return arr; }
+  } catch(e){}
+  return [{name:'Dr. Al-Ghamdi', sub:'Cardiology \u00B7 Erfan', stage:0}];
+}
+function saveSpeakers(){
+  try { localStorage.setItem(SPK_KEY, JSON.stringify(speakers)); } catch(e){}
+}
+let speakers = loadSpeakers();
+
+function initials(n){ const p=n.replace(/^Dr\.?\s*/i,'').trim().split(/\s+/); return (((p[0]||'')[0]||'')+((p[1]||'')[0]||'')).toUpperCase(); }
+
+function renderSpeakers(){
+  const list = document.getElementById('speaker-list');
+  list.innerHTML = '';
+  speakers.forEach((s,i)=>{
+    const c = STAGE_COLOR[STAGES[s.stage]];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cursor = 'default';
+    card.innerHTML =
+      '<div class="row">'+
+      '<div class="avatar '+AV[i%AV.length]+'">'+initials(s.name)+'</div>'+
+      '<div class="info"><p class="name">'+s.name+'</p><p class="sub">'+s.sub+'</p></div>'+
+      '<button class="stage-btn" style="background:'+c[0]+';color:'+c[1]+';" onclick="advance('+i+')">'+
+      '<i class="ti '+STAGE_ICON[STAGES[s.stage]]+'"></i>'+STAGES[s.stage]+'</button>'+
+      '</div>';
+    list.appendChild(card);
+  });
+  const top = speakers[0];
+  if(top){
+    const c = STAGE_COLOR[STAGES[top.stage]];
+    document.getElementById('home-spk-av').textContent = initials(top.name);
+    document.getElementById('home-spk-name').textContent = top.name;
+    document.getElementById('home-spk-sub').textContent = top.sub;
+    const hs = document.getElementById('home-spk-stage');
+    hs.textContent = STAGES[top.stage]; hs.style.background=c[0]; hs.style.color=c[1];
+  }
+}
+function advance(i){ speakers[i].stage = (speakers[i].stage+1)%STAGES.length; saveSpeakers(); renderSpeakers(); }
+function toggleForm(){ const f=document.getElementById('add-form'); f.style.display = f.style.display==='none'?'block':'none'; }
+function addSpeaker(){
+  const n=document.getElementById('spk-name-in').value.trim();
+  const s=document.getElementById('spk-sub-in').value.trim();
+  if(!n) return;
+  speakers.push({name:n, sub:s||'\u2014', stage:0});
+  document.getElementById('spk-name-in').value='';
+  document.getElementById('spk-sub-in').value='';
+  saveSpeakers(); toggleForm(); renderSpeakers();
+}
+
+const ACCOUNTS = ['DSFH','UDH','Erfan','MyClinic'];
+const SKUS = ['Divinus 5','Divinus 10','Edarbi 40','Edarbi 80','Edarbyclor 12.5','Edarbyclor 25'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const AV_ACCT = {'DSFH':'av-teal','UDH':'av-purple','Erfan':'av-blue','MyClinic':'av-amber'};
+
+function loadConsumption(){
+  try { const raw = localStorage.getItem(CONS_KEY); if(raw) return JSON.parse(raw)||{}; } catch(e){}
+  return {};
+}
+let consData = loadConsumption();
+function saveConsumption(){
+  try { localStorage.setItem(CONS_KEY, JSON.stringify(consData)); } catch(e){}
+}
+function setCell(key, val){
+  const n = parseInt(val, 10);
+  consData[key] = isNaN(n) ? 0 : n;
+  saveConsumption();
+}
+
+function renderConsumption(){
+  const wrap = document.getElementById('consume-list');
+  wrap.innerHTML='';
+  ACCOUNTS.forEach(acct=>{
+    const block = document.createElement('div');
+    block.className='consume-acct';
+    let head='<p class="consume-acct-name"><span class="avatar '+AV_ACCT[acct]+'" style="width:24px;height:24px;font-size:10px;">'+acct.substring(0,2).toUpperCase()+'</span>'+acct+'</p>';
+    let thead='<tr><th>SKU</th>'+MONTHS.map(m=>'<th>'+m+'</th>').join('')+'</tr>';
+    let rows='';
+    SKUS.forEach(sku=>{
+      let cells='';
+      MONTHS.forEach(m=>{
+        const key = acct+'|'+sku+'|'+m;
+        const val = consData[key] != null ? consData[key] : 0;
+        cells+='<td><input type="number" value="'+val+'" inputmode="numeric" onfocus="this.select()" oninput="setCell(\''+key+'\', this.value)"/></td>';
+      });
+      rows+='<tr><td>'+sku+'</td>'+cells+'</tr>';
+    });
+    block.innerHTML = head+'<div class="grid-scroll"><table class="ctable"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div>';
+    wrap.appendChild(block);
+  });
+}
+
+renderSpeakers();
+renderConsumption();
+</script>
+</body>
+</html>
